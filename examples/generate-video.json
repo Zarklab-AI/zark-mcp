@@ -1,0 +1,16 @@
+{
+  "jsonrpc": "2.0",
+  "id": 4,
+  "method": "tools/call",
+  "params": {
+    "name": "generate_video",
+    "arguments": {
+      "prompt": "Create a vertical launch video for a creator coffee brand, energetic product reveal, creator-style edit.",
+      "aspectRatio": "9:16",
+      "durationSeconds": 6,
+      "resolution": "720p",
+      "sound": "on"
+    }
+  }
+}
+

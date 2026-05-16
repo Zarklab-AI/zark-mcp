@@ -1,0 +1,14 @@
+{
+  "jsonrpc": "2.0",
+  "id": 3,
+  "method": "tools/call",
+  "params": {
+    "name": "generate_image",
+    "arguments": {
+      "prompt": "Create a cinematic poster image for a creator coffee brand, warm studio lighting, premium social campaign look.",
+      "aspectRatio": "4:5",
+      "quality": "High"
+    }
+  }
+}
+
