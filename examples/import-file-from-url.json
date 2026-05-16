@@ -1,0 +1,12 @@
+{
+  "jsonrpc": "2.0",
+  "id": 7,
+  "method": "tools/call",
+  "params": {
+    "name": "import_file_from_url",
+    "arguments": {
+      "url": "https://example.com/product-photo.png",
+      "filename": "product-photo.png"
+    }
+  }
+}

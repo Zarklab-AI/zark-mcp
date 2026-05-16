@@ -2,7 +2,7 @@
 
 Zark is a remote MCP server for creator-ready image and video work.
 
-Use it from MCP-compatible agents to generate images, edit images, create videos, animate images, edit videos, and fetch generated file previews.
+Use it from MCP-compatible agents to generate images, edit images, create videos, animate images, edit videos, import files from public URLs, list recent files, and fetch generated file previews.
 
 ## Server
 
@@ -74,6 +74,27 @@ curl --request POST \
         "fileId": "file-..."
       }
     }
+}'
+```
+
+Import a public file URL:
+
+```bash
+curl --request POST \
+  --url https://api.zarklab.ai/v1/mcp \
+  --header 'Content-Type: application/json' \
+  --header 'X-API-Key: <your-zark-api-key>' \
+  --data '{
+    "jsonrpc": "2.0",
+    "id": 4,
+    "method": "tools/call",
+    "params": {
+      "name": "import_file_from_url",
+      "arguments": {
+        "url": "https://example.com/product-photo.png",
+        "filename": "product-photo.png"
+      }
+    }
   }'
 ```
 
@@ -87,6 +108,8 @@ curl --request POST \
 | `animate_image` | Turn one or more source images into a video. |
 | `edit_video` | Edit, reference-edit, extend, upscale, lip-sync, add audio, or motion-transfer a source video. |
 | `get_file` | Fetch metadata plus preview/download URLs for generated or referenced Zark files. |
+| `list_files` | List recent uploaded, generated, or imported files for the API key workspace. |
+| `import_file_from_url` | Import a public image, video, or audio URL and return a reusable Zark file ID. |
 
 ## Registry Links
 
