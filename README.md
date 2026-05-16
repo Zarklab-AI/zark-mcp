@@ -88,19 +88,8 @@ curl --request POST \
 | `edit_video` | Edit, reference-edit, extend, upscale, lip-sync, add audio, or motion-transfer a source video. |
 | `get_file` | Fetch metadata plus preview/download URLs for generated or referenced Zark files. |
 
-## Comparison
-
-| Provider | Public MCP shape | Main tools/capabilities |
-| --- | --- | --- |
-| Zark | Remote MCP over HTTPS with `X-API-Key` | Image generation, image editing, background removal, object/text removal, image reframe/upscale/resize, video generation, image animation, video editing, video reference edit, extend/upscale/lip-sync/add-audio/motion-transfer, file preview lookup. |
-| Higgsfield | First-party remote MCP plus community/local MCP examples | Image generation, video generation, image-to-video, character consistency, style presets, motion presets, generation status, character listing. |
-| Pika | Managed MCP listings and agent skills | Text-to-video, image animation, sound effects, lip-sync, and Pika workflow guidance. Public pages advertise 10 tools but do not expose exact tool schemas without connecting. |
-
-Zark is broader on mixed image/video utility actions and file handoff. Higgsfield emphasizes cinematic image/video generation, character consistency, and motion presets. Pika emphasizes Pika-native video creation, animation, sound, and lip-sync workflows.
-
 ## Registry Links
 
 - Smithery: [smithery.ai/servers/zark/zarklab](https://smithery.ai/servers/zark/zarklab)
 - Official MCP Registry: `io.github.Zarklab-AI/zark-media`
 - Documentation: [docs.zarklab.ai](https://docs.zarklab.ai)
-
