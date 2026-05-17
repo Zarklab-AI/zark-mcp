@@ -14,7 +14,7 @@ Usage:
   zark files list [--limit 20] [--media image|video|audio|all]
   zark files import-url <url> [--filename name]
   zark files get <file_id>
-  zark files upload <path>
+  zark files upload <path> [--workspace wks_...] [--user user_...] [--folder folder_id]
   zark mcp tools
 
 Environment:
@@ -22,8 +22,8 @@ Environment:
   ZARK_API_BASE_URL Optional. Defaults to ${DEFAULT_BASE_URL}.
 
 Notes:
-  Local file upload requires the public storage upload endpoint to be enabled.
-  Public URL import, file listing, and file preview use the live Zark MCP tools.
+  Public API calls infer workspace/user from your API key.
+  Use --workspace / --user only when calling a lower-level or development endpoint directly.
 `);
 }
 
@@ -99,6 +99,56 @@ function printJson(value) {
   console.log(JSON.stringify(value, null, 2));
 }
 
+function contentTypeFor(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  const types = {
+    ".apng": "image/apng",
+    ".avif": "image/avif",
+    ".csv": "text/csv",
+    ".gif": "image/gif",
+    ".heic": "image/heic",
+    ".html": "text/html",
+    ".jpeg": "image/jpeg",
+    ".jpg": "image/jpeg",
+    ".json": "application/json",
+    ".m4a": "audio/mp4",
+    ".md": "text/markdown",
+    ".mov": "video/quicktime",
+    ".mp3": "audio/mpeg",
+    ".mp4": "video/mp4",
+    ".mpeg": "video/mpeg",
+    ".pdf": "application/pdf",
+    ".png": "image/png",
+    ".txt": "text/plain",
+    ".wav": "audio/wav",
+    ".webm": "video/webm",
+    ".webp": "image/webp"
+  };
+  return types[ext] || "application/octet-stream";
+}
+
+async function postMultipart(url, form) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "X-API-Key": requireApiKey()
+    },
+    body: form
+  });
+  const text = await response.text();
+  let parsed;
+  try {
+    parsed = text ? JSON.parse(text) : null;
+  } catch {
+    parsed = text;
+  }
+  if (!response.ok) {
+    const detail = typeof parsed === "string" ? parsed : JSON.stringify(parsed);
+    throw new Error(`HTTP ${response.status}: ${detail}`);
+  }
+  return parsed;
+}
+
 async function listFiles(args) {
   const limitText = readFlag(args, "--limit", "20");
   const limit = Number.parseInt(limitText, 10);
@@ -139,16 +189,26 @@ async function getFile(args) {
 async function uploadFile(args) {
   const filePath = args[0];
   if (!filePath || filePath.startsWith("--")) {
-    throw new Error("Usage: zark files upload <path>");
+    throw new Error("Usage: zark files upload <path> [--workspace wks_...] [--user user_...] [--folder folder_id]");
   }
 
   const resolved = path.resolve(filePath);
-  await fs.access(resolved);
+  const fileBytes = await fs.readFile(resolved);
+  const filename = readFlag(args, "--filename", path.basename(resolved));
+  const contentType = readFlag(args, "--content-type", contentTypeFor(resolved));
+  const workspace = readFlag(args, "--workspace");
+  const user = readFlag(args, "--user");
+  const folder = readFlag(args, "--folder");
+  const kind = readFlag(args, "--kind", "workspace_drive");
 
-  throw new Error(
-    "Local file upload is not enabled on the public API yet. " +
-      "Use `zark files import-url <public-url>` today, or enable POST /v1/storage/files for multipart uploads."
-  );
+  const form = new FormData();
+  form.set("file", new Blob([fileBytes], { type: contentType }), filename);
+  form.set("kind", kind);
+  if (workspace) form.set("workspace_id", workspace);
+  if (user) form.set("user_id", user);
+  if (folder) form.set("folder_id", folder);
+
+  printJson(await postMultipart(`${apiBaseUrl()}/v1/storage/files`, form));
 }
 
 async function listTools() {
