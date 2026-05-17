@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.Zarklab-AI/zark-media",
   "title": "Zark Creative Media",
-  "description": "Create, edit, and track creator-ready images and videos with Zark.",
-  "version": "1.0.0",
+  "description": "Create, edit, and track creator-ready images and videos with Zark. Supports ChatGPT Apps tool metadata, file params, and a widget resource.",
+  "version": "1.0.1",
   "websiteUrl": "https://zarklab.ai",
   "repository": {
     "url": "https://github.com/Zarklab-AI/zark-mcp",
@@ -33,7 +33,7 @@
       ],
       "homepage": "https://zarklab.ai",
       "documentation": "https://docs.zarklab.ai/agent-integrations/mcp",
-      "tagline": "Create, edit, and track creator-ready images and videos from any MCP agent.",
+      "tagline": "Create, edit, and track creator-ready images and videos from any MCP agent or ChatGPT App.",
       "tags": [
         "mcp",
         "image-generation",

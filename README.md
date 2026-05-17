@@ -4,6 +4,8 @@ Zark is a remote MCP server for creator-ready image and video work.
 
 Use it from MCP-compatible agents to generate images, edit images, create videos, animate images, edit videos, import files from public URLs, list recent files, and fetch generated file previews.
 
+The remote server is also prepared for ChatGPT Apps: tools include output schemas, Apps SDK `_meta`, a small `text/html;profile=mcp-app` widget resource, and file params for ChatGPT-uploaded images/videos.
+
 ## Server
 
 ```text
@@ -66,6 +68,21 @@ zark mcp tools
 ```
 
 ## Quick Test
+
+Discover the ChatGPT Apps widget resource:
+
+```bash
+curl --request POST \
+  --url https://api.zarklab.ai/v1/mcp \
+  --header 'Content-Type: application/json' \
+  --header 'X-API-Key: <your-zark-api-key>' \
+  --data '{
+    "jsonrpc": "2.0",
+    "id": 0,
+    "method": "resources/list",
+    "params": {}
+  }'
+```
 
 List tools:
 
@@ -144,6 +161,32 @@ curl --request POST \
     }
   }'
 ```
+
+For ChatGPT Apps file uploads, file tools can receive a file reference directly:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 5,
+  "method": "tools/call",
+  "params": {
+    "name": "animate_image",
+    "arguments": {
+      "prompt": "Animate this logo into a clean cinematic reveal.",
+      "inputFile": {
+        "download_url": "https://...",
+        "file_id": "chatgpt-file-id",
+        "mime_type": "image/png",
+        "file_name": "logo.png"
+      },
+      "aspectRatio": "9:16",
+      "durationSeconds": 6
+    }
+  }
+}
+```
+
+Zark imports that temporary ChatGPT file into your Zark workspace first, then runs the creative tool with a normal Zark `file_id`.
 
 ## Tools
 
