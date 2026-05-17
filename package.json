@@ -1,0 +1,16 @@
+{
+  "name": "@zarklab/cli",
+  "version": "0.1.0",
+  "description": "CLI helpers for Zark creative media API and MCP storage tools.",
+  "bin": {
+    "zark": "./bin/zark.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Zarklab-AI/zark-mcp.git"
+  }
+}
