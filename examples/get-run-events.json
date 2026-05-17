@@ -1,0 +1,13 @@
+{
+  "jsonrpc": "2.0",
+  "id": 7,
+  "method": "tools/call",
+  "params": {
+    "name": "get_run_events",
+    "arguments": {
+      "runId": "client-run-001",
+      "sinceEventId": 0,
+      "limit": 50
+    }
+  }
+}

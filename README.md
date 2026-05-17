@@ -155,8 +155,67 @@ curl --request POST \
 | `animate_image` | Turn one or more source images into a video. |
 | `edit_video` | Edit, reference-edit, extend, upscale, lip-sync, add audio, or motion-transfer a source video. |
 | `get_file` | Fetch metadata plus preview/download URLs for generated or referenced Zark files. |
+| `get_run_status` | Poll status for a long-running job started with `wait: false`. |
+| `get_run_events` | Fetch timeline events for a long-running job. |
+| `cancel_run` | Request cancellation for an active creative run. |
 | `list_files` | List recent uploaded, generated, or imported files for the API key workspace. |
 | `import_file_from_url` | Import a public image, video, or audio URL and return a reusable Zark file ID. |
+
+## Long Jobs
+
+Image generation often finishes inside a normal MCP response. Video can take longer. For long jobs, pass `wait: false` to a media tool and poll the returned `run_id`.
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 5,
+  "method": "tools/call",
+  "params": {
+    "name": "generate_video",
+    "arguments": {
+      "runId": "client-run-001",
+      "wait": false,
+      "prompt": "Create a vertical launch video for a creator coffee brand.",
+      "aspectRatio": "9:16",
+      "durationSeconds": 6
+    }
+  }
+}
+```
+
+Poll status:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 6,
+  "method": "tools/call",
+  "params": {
+    "name": "get_run_status",
+    "arguments": {
+      "runId": "client-run-001"
+    }
+  }
+}
+```
+
+Fetch events:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 7,
+  "method": "tools/call",
+  "params": {
+    "name": "get_run_events",
+    "arguments": {
+      "runId": "client-run-001",
+      "sinceEventId": 0,
+      "limit": 50
+    }
+  }
+}
+```
 
 ## Registry Links
 

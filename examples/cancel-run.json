@@ -1,0 +1,11 @@
+{
+  "jsonrpc": "2.0",
+  "id": 8,
+  "method": "tools/call",
+  "params": {
+    "name": "cancel_run",
+    "arguments": {
+      "runId": "client-run-001"
+    }
+  }
+}

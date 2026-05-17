@@ -1,0 +1,17 @@
+{
+  "jsonrpc": "2.0",
+  "id": 5,
+  "method": "tools/call",
+  "params": {
+    "name": "generate_video",
+    "arguments": {
+      "runId": "client-run-001",
+      "wait": false,
+      "prompt": "Create a vertical launch video for a creator coffee brand.",
+      "aspectRatio": "9:16",
+      "durationSeconds": 6,
+      "resolution": "720p",
+      "sound": "on"
+    }
+  }
+}
