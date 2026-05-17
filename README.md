@@ -18,6 +18,53 @@ X-API-Key: <your-zark-api-key>
 
 Get access at [zarklab.ai](https://zarklab.ai).
 
+## CLI
+
+The repo also includes a small CLI for the Zark file/storage workflow.
+
+```bash
+git clone https://github.com/Zarklab-AI/zark-mcp.git
+cd zark-mcp
+npm link
+export ZARK_API_KEY="<your-zark-api-key>"
+```
+
+List recent files:
+
+```bash
+zark files list --limit 10
+```
+
+Import a public image, video, or audio URL into Zark storage:
+
+```bash
+zark files import-url "https://example.com/product-photo.png" --filename product-photo.png
+```
+
+Fetch a generated or imported file preview:
+
+```bash
+zark files get file-...
+```
+
+Upload a local file:
+
+```bash
+zark files upload ./product-photo.png
+```
+
+When calling a lower-level development endpoint directly, pass explicit context:
+
+```bash
+zark files upload ./product-photo.png --workspace wks_... --user user_...
+```
+
+List MCP tools:
+
+```bash
+zark mcp tools
+```
+
 ## Quick Test
 
 List tools:

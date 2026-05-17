@@ -1,0 +1,257 @@
+#!/usr/bin/env node
+
+const fs = require("node:fs/promises");
+const path = require("node:path");
+
+const DEFAULT_BASE_URL = "https://api.zarklab.ai";
+
+let nextRpcId = 1;
+
+function printHelp() {
+  console.log(`Zark CLI
+
+Usage:
+  zark files list [--limit 20] [--media image|video|audio|all]
+  zark files import-url <url> [--filename name]
+  zark files get <file_id>
+  zark files upload <path> [--workspace wks_...] [--user user_...] [--folder folder_id]
+  zark mcp tools
+
+Environment:
+  ZARK_API_KEY       Required. Your Zark API key.
+  ZARK_API_BASE_URL Optional. Defaults to ${DEFAULT_BASE_URL}.
+
+Notes:
+  Public API calls infer workspace/user from your API key.
+  Use --workspace / --user only when calling a lower-level or development endpoint directly.
+`);
+}
+
+function readFlag(args, name, fallback = undefined) {
+  const index = args.indexOf(name);
+  if (index === -1) return fallback;
+  const value = args[index + 1];
+  if (!value || value.startsWith("--")) return fallback;
+  return value;
+}
+
+function hasFlag(args, name) {
+  return args.includes(name);
+}
+
+function requireApiKey() {
+  const apiKey = process.env.ZARK_API_KEY;
+  if (!apiKey) {
+    throw new Error("Missing ZARK_API_KEY. Set it before running the CLI.");
+  }
+  return apiKey;
+}
+
+function apiBaseUrl() {
+  return (process.env.ZARK_API_BASE_URL || DEFAULT_BASE_URL).replace(/\/+$/, "");
+}
+
+async function postJson(url, body) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-API-Key": requireApiKey()
+    },
+    body: JSON.stringify(body)
+  });
+  const text = await response.text();
+  let parsed;
+  try {
+    parsed = text ? JSON.parse(text) : null;
+  } catch {
+    parsed = text;
+  }
+  if (!response.ok) {
+    const detail = typeof parsed === "string" ? parsed : JSON.stringify(parsed);
+    throw new Error(`HTTP ${response.status}: ${detail}`);
+  }
+  return parsed;
+}
+
+async function callMcp(method, params = {}) {
+  const body = {
+    jsonrpc: "2.0",
+    id: nextRpcId++,
+    method,
+    params
+  };
+  const result = await postJson(`${apiBaseUrl()}/v1/mcp`, body);
+  if (result && result.error) {
+    throw new Error(`MCP ${result.error.code}: ${result.error.message}`);
+  }
+  return result;
+}
+
+async function callTool(name, args) {
+  return callMcp("tools/call", {
+    name,
+    arguments: args
+  });
+}
+
+function printJson(value) {
+  console.log(JSON.stringify(value, null, 2));
+}
+
+function contentTypeFor(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  const types = {
+    ".apng": "image/apng",
+    ".avif": "image/avif",
+    ".csv": "text/csv",
+    ".gif": "image/gif",
+    ".heic": "image/heic",
+    ".html": "text/html",
+    ".jpeg": "image/jpeg",
+    ".jpg": "image/jpeg",
+    ".json": "application/json",
+    ".m4a": "audio/mp4",
+    ".md": "text/markdown",
+    ".mov": "video/quicktime",
+    ".mp3": "audio/mpeg",
+    ".mp4": "video/mp4",
+    ".mpeg": "video/mpeg",
+    ".pdf": "application/pdf",
+    ".png": "image/png",
+    ".txt": "text/plain",
+    ".wav": "audio/wav",
+    ".webm": "video/webm",
+    ".webp": "image/webp"
+  };
+  return types[ext] || "application/octet-stream";
+}
+
+async function postMultipart(url, form) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "X-API-Key": requireApiKey()
+    },
+    body: form
+  });
+  const text = await response.text();
+  let parsed;
+  try {
+    parsed = text ? JSON.parse(text) : null;
+  } catch {
+    parsed = text;
+  }
+  if (!response.ok) {
+    const detail = typeof parsed === "string" ? parsed : JSON.stringify(parsed);
+    throw new Error(`HTTP ${response.status}: ${detail}`);
+  }
+  return parsed;
+}
+
+async function listFiles(args) {
+  const limitText = readFlag(args, "--limit", "20");
+  const limit = Number.parseInt(limitText, 10);
+  if (!Number.isFinite(limit) || limit < 1) {
+    throw new Error("--limit must be a positive number.");
+  }
+
+  const media = readFlag(args, "--media", "all");
+  const toolArgs = { limit };
+  if (media && media !== "all") {
+    toolArgs.mediaType = media;
+  }
+
+  printJson(await callTool("list_files", toolArgs));
+}
+
+async function importUrl(args) {
+  const url = args[0];
+  if (!url || url.startsWith("--")) {
+    throw new Error("Usage: zark files import-url <url> [--filename name]");
+  }
+  const filename = readFlag(args, "--filename");
+  const toolArgs = { url };
+  if (filename) {
+    toolArgs.filename = filename;
+  }
+  printJson(await callTool("import_file_from_url", toolArgs));
+}
+
+async function getFile(args) {
+  const fileId = args[0];
+  if (!fileId || fileId.startsWith("--")) {
+    throw new Error("Usage: zark files get <file_id>");
+  }
+  printJson(await callTool("get_file", { fileId }));
+}
+
+async function uploadFile(args) {
+  const filePath = args[0];
+  if (!filePath || filePath.startsWith("--")) {
+    throw new Error("Usage: zark files upload <path> [--workspace wks_...] [--user user_...] [--folder folder_id]");
+  }
+
+  const resolved = path.resolve(filePath);
+  const fileBytes = await fs.readFile(resolved);
+  const filename = readFlag(args, "--filename", path.basename(resolved));
+  const contentType = readFlag(args, "--content-type", contentTypeFor(resolved));
+  const workspace = readFlag(args, "--workspace");
+  const user = readFlag(args, "--user");
+  const folder = readFlag(args, "--folder");
+  const kind = readFlag(args, "--kind", "workspace_drive");
+
+  const form = new FormData();
+  form.set("file", new Blob([fileBytes], { type: contentType }), filename);
+  form.set("kind", kind);
+  if (workspace) form.set("workspace_id", workspace);
+  if (user) form.set("user_id", user);
+  if (folder) form.set("folder_id", folder);
+
+  printJson(await postMultipart(`${apiBaseUrl()}/v1/storage/files`, form));
+}
+
+async function listTools() {
+  printJson(await callMcp("tools/list", {}));
+}
+
+async function main() {
+  const args = process.argv.slice(2);
+  if (args.length === 0 || hasFlag(args, "--help") || hasFlag(args, "-h")) {
+    printHelp();
+    return;
+  }
+
+  const [scope, command, ...rest] = args;
+  if (scope === "mcp" && command === "tools") {
+    await listTools();
+    return;
+  }
+
+  if (scope === "files") {
+    if (command === "list") {
+      await listFiles(rest);
+      return;
+    }
+    if (command === "import-url") {
+      await importUrl(rest);
+      return;
+    }
+    if (command === "get") {
+      await getFile(rest);
+      return;
+    }
+    if (command === "upload") {
+      await uploadFile(rest);
+      return;
+    }
+  }
+
+  printHelp();
+  process.exitCode = 1;
+}
+
+main().catch((error) => {
+  console.error(`Error: ${error.message}`);
+  process.exitCode = 1;
+});
