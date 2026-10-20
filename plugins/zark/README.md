@@ -31,4 +31,4 @@ and waits for your yes.
 
 ## Support
 
-https://www.zarklab.ai/contact · Terms: https://www.zarklab.ai/terms
+https://www.zarklab.ai/contact · Terms: https://www.zarklab.ai/terms · Help: https://docs.zarklab.ai/connect-ai-apps

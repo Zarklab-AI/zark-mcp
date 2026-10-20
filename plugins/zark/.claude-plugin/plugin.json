@@ -13,7 +13,7 @@
   "license": "MIT",
   "keywords": ["images", "video", "music", "voice", "short-films", "media", "creative"],
   "icon": "./assets/logo.png",
-  "documentationUrl": "https://www.zarklab.ai",
+  "documentationUrl": "https://docs.zarklab.ai/connect-ai-apps",
   "supportUrl": "https://www.zarklab.ai/contact",
   "privacyPolicyUrl": "https://www.zarklab.ai/privacy",
   "termsOfServiceUrl": "https://www.zarklab.ai/terms"
