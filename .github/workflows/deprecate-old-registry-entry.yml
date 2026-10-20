@@ -1,0 +1,31 @@
+# One-off (owner 10/20): mark the old MCP Registry entry io.github.Zarklab-AI/zark-media
+# as replaced by ai.zarklab/zark. Run by hand only. Removed again after it has run.
+name: Deprecate old MCP Registry entry
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deprecate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install mcp-publisher 1.8.1 (official release, checksum checked)
+        run: |
+          set -euo pipefail
+          curl -fsSL -o mcp-publisher.tar.gz \
+            https://github.com/modelcontextprotocol/registry/releases/download/v1.8.1/mcp-publisher_linux_amd64.tar.gz
+          echo "a06c9096dcb9727c13555b6be26c7effa707b01f06a4c561ba7a3635443cf2cc  mcp-publisher.tar.gz" | sha256sum -c -
+          tar xzf mcp-publisher.tar.gz mcp-publisher
+          ./mcp-publisher --version
+
+      - name: Sign in with GitHub Actions OIDC
+        run: ./mcp-publisher login github-oidc
+
+      - name: Mark io.github.Zarklab-AI/zark-media deprecated
+        run: |
+          ./mcp-publisher status --status deprecated --message "Replaced by ai.zarklab/zark" \
+            --all-versions --yes io.github.Zarklab-AI/zark-media
