@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "zark",
+  "displayName": "Zark",
+  "version": "1.0.0",
+  "description": "Learn, Play & Create. Swap the endless scroll for stories, movies and games your family makes with AI.",
+  "author": {
+    "name": "Zark Lab, Inc.",
+    "url": "https://www.zarklab.ai"
+  },
+  "homepage": "https://www.zarklab.ai",
+  "repository": "https://github.com/Zarklab-AI/zark-mcp",
+  "license": "MIT",
+  "keywords": ["images", "video", "music", "voice", "short-films", "media", "creative"],
+  "icon": "./assets/logo.png",
+  "documentationUrl": "https://www.zarklab.ai",
+  "supportUrl": "https://www.zarklab.ai/contact",
+  "privacyPolicyUrl": "https://www.zarklab.ai/privacy",
+  "termsOfServiceUrl": "https://www.zarklab.ai/terms"
+}
