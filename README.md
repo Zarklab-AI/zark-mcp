@@ -18,6 +18,16 @@ X-API-Key: <your-zark-api-key>
 
 Get access at [zarklab.ai](https://zarklab.ai).
 
+## Claude plugin
+
+`plugins/zark` is Zark's Claude plugin: the Zark MCP server at `https://mcp.zarklab.ai/` (sign in with your Zark
+account) plus skills that help Claude use it. Install it in Claude Code:
+
+```bash
+claude plugin marketplace add Zarklab-AI/zark-mcp
+claude plugin install zark@zark
+```
+
 ## CLI
 
 The repo also includes a small CLI for the Zark file/storage workflow.

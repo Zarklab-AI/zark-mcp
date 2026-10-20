@@ -1,0 +1,15 @@
+{
+  "name": "zark",
+  "description": "Zark's plugin for Claude: make and edit pictures, videos, music, voice and short films.",
+  "owner": {
+    "name": "Zark Lab, Inc.",
+    "url": "https://www.zarklab.ai"
+  },
+  "plugins": [
+    {
+      "name": "zark",
+      "source": "./plugins/zark",
+      "description": "Learn, Play & Create. Swap the endless scroll for stories, movies and games your family makes with AI."
+    }
+  ]
+}
